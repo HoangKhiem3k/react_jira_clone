@@ -5,7 +5,7 @@ import { GET_ALL_STATUS, GET_ALL_STATUS_SAGA } from "../../util/constants/settin
 function * getAllStatusSaga (action) {
 
     try {
-        const {data,status} = yield call(()=> jiraService.getAllStatus());
+        const {data} = yield call(()=> jiraService.getAllStatus());
 
         yield put({
             type: GET_ALL_STATUS,

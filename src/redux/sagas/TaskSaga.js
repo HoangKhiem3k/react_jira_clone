@@ -1,6 +1,6 @@
 import {call, put,takeLatest} from 'redux-saga/effects'
 import { jiraService } from '../../services/JiraService';
-import { CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, HIDE_LOADING, STATUS_CODE } from '../../util/constants/settingSystem';
+import { CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, GET_TASK_DETAIL, GET_TASK_DETAIL_SAGA, HIDE_LOADING, STATUS_CODE } from '../../util/constants/settingSystem';
 import { notifiFunction } from '../../util/Notification/notificationJira';
 
 function* createTaskSaga (action) { 
@@ -31,4 +31,31 @@ function* createTaskSaga (action) {
 }
 export function * theoDoiCreateTaskSaga() {
     yield takeLatest(CREATE_TASK_SAGA,createTaskSaga);
+}
+
+function * getTaskDetailSaga(action) {
+    
+    const {taskId} = action;
+
+    try{
+        const {data} = yield call(()=>jiraService.getTaskDetail(taskId));
+
+        yield put({
+            type:GET_TASK_DETAIL,
+            taskDetailModal:data.content
+        })
+
+    }catch(err) {
+
+        console.log(err);
+        console.log(err.response?.data);
+
+    }
+
+
+}
+export function* theoDoiGetTaskDetailSaga(action) {
+
+    yield takeLatest(GET_TASK_DETAIL_SAGA,getTaskDetailSaga )
+
 }

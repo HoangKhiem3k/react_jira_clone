@@ -1,6 +1,6 @@
 import { Editor } from '@tinymce/tinymce-react'
 import React, { useEffect, useState } from 'react'
-import { Select, Radio,Slider } from 'antd';
+import { Select, Slider } from 'antd';
 import {useSelector,useDispatch,connect} from 'react-redux'
 
 
@@ -32,13 +32,9 @@ for (let i = 10; i < 36; i++) {
     })
     //Do kết nối với withformik => component có các props
     const {
-        values,
-        touched,
-        errors,
+        
         handleChange,
-        handleBlur,
         handleSubmit,
-        setValues,
         setFieldValue
     } = props;
 
@@ -47,7 +43,7 @@ for (let i = 10; i < 36; i++) {
 
  
     
-    const [size, setSize] = React.useState('default');
+    const [size] = React.useState('default');
 
     const [timeTracking,setTimetracking] = useState({
         timeTrackingSpent:0,

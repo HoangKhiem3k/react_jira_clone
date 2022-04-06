@@ -24,6 +24,7 @@ export function * rootSaga(){
         TaskTypeSaga.theoDoiGetAllTaskTypeSaga(),
         PrioritySaga.theoDoiGetAllPriority(),
         TaskSaga.theoDoiCreateTaskSaga(),
+        TaskSaga.theoDoiGetTaskDetailSaga(),
         StatusSaga.theoDoiGetAllStatusSaga(),
     ])
 }

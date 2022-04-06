@@ -44,7 +44,7 @@ function* getUserSaga(action) {
 
     //Gọi api 
     try {
-        const { data, status } = yield call(() => jiraService.getUser(action.keyWord));
+        const { data } = yield call(() => jiraService.getUser(action.keyWord));
 
         yield put({
             type:GET_USER_SEARCH,
@@ -68,7 +68,7 @@ function* addUserProjectSaga(action) {
     
    
     try {
-        const { data, status } = yield call(() => jiraService.assignUserProject(action.userProject));
+        yield call(() => jiraService.assignUserProject(action.userProject));
         
         yield put({
             type:GET_LIST_PROJECT_SAGA
@@ -89,7 +89,7 @@ function* removeUserProjectSaga(action) {
     
    
     try {
-        const { data, status } = yield call(() => jiraService.deleteUserFromProject(action.userProject));
+        yield call(() => jiraService.deleteUserFromProject(action.userProject));
         
         yield put({
             type: GET_LIST_PROJECT_SAGA

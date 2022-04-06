@@ -149,7 +149,7 @@ function* getProjectDetailSaga(action) {
     yield delay (500);
 
     try {
-        const { data, status } = yield call(() => jiraService.getProjectDetail(action.projectId));
+        const { data } = yield call(() => jiraService.getProjectDetail(action.projectId));
         
         console.log('data',data);
         //Lấy dữ liệu thành công thì đưa dữ liệu lên redux
@@ -182,7 +182,7 @@ function* getProjectAllSaga(action) {
     yield delay (500);
 
     try {
-        const { data, status } = yield call(() => jiraService.getAllProject());
+        const { data } = yield call(() => jiraService.getAllProject());
         
       
         //Lấy dữ liệu thành công thì đưa dữ liệu lên redux

@@ -126,5 +126,12 @@ export const jiraService = {
             method:'GET',
             headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
         })
+    },
+    getTaskDetail: (taskId) => {
+        return Axios({
+            url:`${DOMAIN_JIRA}/Project/getTaskDetail?taskId=${taskId}`,
+            method:'GET',
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
+        })
     }
 }
