@@ -1,6 +1,6 @@
 import {delay, put, takeLatest,call} from 'redux-saga/effects';
 import { jiraService } from "../../services/JiraService";
-import { ADD_USER_PROJECT_API, DISPLAY_LOADING, GET_LIST_PROJECT_SAGA, GET_USER_API, GET_USER_SEARCH, HIDE_LOADING, REMOVE_USER_PROJECT_API, TOKEN, USER_LOGIN, USER_SIGNIN_API, USLOGIN } from "../../util/constants/settingSystem";
+import { ADD_USER_PROJECT_API, DISPLAY_LOADING, GET_LIST_PROJECT_SAGA, GET_USER_API, GET_USER_BY_PROJECT_ID, GET_USER_BY_PROJECT_ID_SAGA, GET_USER_SEARCH, HIDE_LOADING, REMOVE_USER_PROJECT_API, STATUS_CODE, TOKEN, USER_LOGIN, USER_SIGNIN_API, USLOGIN } from "../../util/constants/settingSystem";
 import {history} from '../../util/history'
 // Quản lý các action saga
 
@@ -104,4 +104,37 @@ function* removeUserProjectSaga(action) {
 
 export function* theoDoiRemoveUserProject () {
     yield takeLatest(REMOVE_USER_PROJECT_API, removeUserProjectSaga);
+}
+
+function* getUserByProjectIdSaga(action) {
+    const { idProject } = action;
+    console.log('action',idProject)
+
+    try {
+        const { data, status } = yield call(() => jiraService.getUserByProjectId(idProject));
+        console.log('checkdata',data);
+
+        if (status === STATUS_CODE.SUCCESS) {
+            yield put({
+                type:GET_USER_BY_PROJECT_ID,
+                arrUser:data.content
+            })
+        }
+
+    } catch (err) {
+        console.log(err);
+        console.log(err.response?.data);
+        if(err.response?.data.statusCode === STATUS_CODE.NOT_FOUND) {
+            yield put({
+                type:GET_USER_BY_PROJECT_ID,
+                arrUser:[]
+            })
+        }
+    }
+}
+
+
+
+export function* theoDoiGetUserByProjectIdSaga() {
+    yield takeLatest(GET_USER_BY_PROJECT_ID_SAGA, getUserByProjectIdSaga)
 }

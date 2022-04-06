@@ -112,6 +112,19 @@ export const jiraService = {
             data: taskObject,
             headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
         })
+    },
+    getAllStatus: () => {
+        return Axios({
+            url:`${DOMAIN_JIRA}/Status/getAll`,
+            method:'GET',
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
+        })
+    },
+    getUserByProjectId: (idProject) => {
+        return Axios({
+            url:`${DOMAIN_JIRA}/Users/getUserByProjectId?idProject=${idProject}`,
+            method:'GET',
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
+        })
     }
-
 }

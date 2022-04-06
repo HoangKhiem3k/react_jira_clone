@@ -5,6 +5,7 @@ import * as ProjectSaga from './ProjectSaga'
 import * as TaskTypeSaga from './TaskTypeSaga'
 import * as PrioritySaga from './PrioritySaga'
 import * as TaskSaga from './TaskSaga'
+import * as StatusSaga from './StatusSaga'
 export function * rootSaga(){
     yield all([
         //Nghiệp vụ theo dõi action saga
@@ -12,6 +13,7 @@ export function * rootSaga(){
         UserJiraSaga.theoDoiGetUser(),
         UserJiraSaga.theoDoiAddUserProject(),
         UserJiraSaga.theoDoiRemoveUserProject(),
+        UserJiraSaga.theoDoiGetUserByProjectIdSaga(),
         ProjectCategoryJira.theoDoigetAllProjectCategory(),
         ProjectSaga.theoDoiCreateProjectSaga(),
         ProjectSaga.theoDoiGetListProjectSaga(),
@@ -22,5 +24,6 @@ export function * rootSaga(){
         TaskTypeSaga.theoDoiGetAllTaskTypeSaga(),
         PrioritySaga.theoDoiGetAllPriority(),
         TaskSaga.theoDoiCreateTaskSaga(),
+        StatusSaga.theoDoiGetAllStatusSaga(),
     ])
 }

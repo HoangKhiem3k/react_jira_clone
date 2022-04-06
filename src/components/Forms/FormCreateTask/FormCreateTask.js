@@ -1,4 +1,3 @@
-import { CREATE_TASK_SAGA, GET_ALL_PRIORITY_SAGA, GET_ALL_PROJECT_SAGA, GET_ALL_TASK_TYPE_SAGA, GET_USER_API } from '../../../util/constants/settingSystem';
 import { Editor } from '@tinymce/tinymce-react'
 import React, { useEffect, useState } from 'react'
 import { Select, Radio,Slider } from 'antd';
@@ -8,6 +7,8 @@ import {useSelector,useDispatch,connect} from 'react-redux'
 import {withFormik} from 'formik';
 
 import * as Yup from 'yup'
+import { CREATE_TASK_SAGA, GET_ALL_PRIORITY_SAGA, GET_ALL_PROJECT_SAGA, GET_ALL_STATUS_SAGA, GET_ALL_TASK_TYPE_SAGA, GET_USER_API, GET_USER_BY_PROJECT_ID_SAGA, SET_SUBMIT_CREATE_TASK } from '../../../util/constants/settingSystem';
+
 const { Option } = Select;
 
 const children = [];
@@ -21,9 +22,12 @@ for (let i = 10; i < 36; i++) {
     const {arrProject} = useSelector(state=>state.ProjectJiraReducer);
     const {arrTaskType} = useSelector(state=>state.TaskTypeReducer);
     const {arrPriority} = useSelector(state => state.PriorityReducer);
-    const {userSearch} = useSelector(state => state.UserLoginJiraReducer);
+    const {arrUser} = useSelector(state => state.UserLoginJiraReducer);
+    const {arrStatus} = useSelector(state => state.StatusReducer);
+
+    console.log('arrStatus',arrStatus);
     //Hàm biến đổi options cho thẻ select
-    const userOptions = userSearch.map((item,index) => {
+    const userOptions = arrUser.map((item,index) => {
         return {value:item.userId,label:item.name}
     })
     //Do kết nối với withformik => component có các props
@@ -57,7 +61,11 @@ for (let i = 10; i < 36; i++) {
         dispatch({type:GET_ALL_PROJECT_SAGA});
         dispatch({type:GET_ALL_TASK_TYPE_SAGA});
         dispatch({type:GET_ALL_PRIORITY_SAGA});
-        dispatch({type:'GET_USER_API',keyWord:''});
+        dispatch({type:GET_ALL_STATUS_SAGA});
+        //Đưa hàm handle submit lên drawer reducer để cập nhật lại sự kiện cho nút submitt
+        dispatch({type:SET_SUBMIT_CREATE_TASK,submitFunction:handleSubmit})
+
+        dispatch({type:GET_USER_API,keyWord:''});
 
     },[])
 
@@ -69,7 +77,19 @@ for (let i = 10; i < 36; i++) {
         <form className="container" onSubmit={handleSubmit}>          
             <div className="form-group">
                 <p>Project</p>
-                <select name="projectId" className="form-control" onChange={handleChange}>
+                <select  name="projectId" className="form-control" onChange={(e) => {
+
+                    //dispatch giá trị làm thay đổi arrUser
+                    let {value} = e.target;
+                    dispatch({
+                        type:GET_USER_BY_PROJECT_ID_SAGA,
+                        idProject:value
+                    })
+                    //Cập nhật giá trị cho project Id
+                    setFieldValue('projectId',e.target.value);
+
+
+                }}>
                    {arrProject.map((project,index)=>{
                        return <option key={index} value={project.id}>{project.projectName}</option>
                    })}
@@ -78,6 +98,14 @@ for (let i = 10; i < 36; i++) {
             <div className="form-group">
                 <p>Task name</p>
                 <input name="taskName" className="form-control" onChange={handleChange} />
+            </div> 
+            <div className="form-group">
+                <p>Status</p>
+                <select name="statusId" className="form-control" onChange={handleChange}>
+                    {arrStatus.map((statusItem,index) => {
+                        return <option key={index} value={statusItem.statusId}>{statusItem.statusName}</option>
+                    })}
+                </select>
             </div> 
             <div className="form-group">
                 <div className="row">
@@ -114,6 +142,7 @@ for (let i = 10; i < 36; i++) {
                             placeholder="Please select"
                             optionFilterProp="label"
                             onChange={(values) => {
+                                //set lại giá trị cho lstUserAsign
                                 setFieldValue('listUserAsign',values);
                             }}
                             onSelect={(value) => { 
@@ -194,7 +223,7 @@ for (let i = 10; i < 36; i++) {
                         }}
                 />
             </div>
-            <button type="submit">submit</button>
+            {/* <button type="submit">submit</button> */}
         </form>
     )
 }
@@ -204,20 +233,26 @@ for (let i = 10; i < 36; i++) {
 
 
 const frmCreateTask = withFormik({
-    // enableReinitialize: true,
+    enableReinitialize: true,
     mapPropsToValues: (props) => {
-   
+        const {arrProject,arrTaskType,arrPriority,arrStatus} = props;
+
+
+        // if(arrProject?.length>0){
+        //     props.dispatch({type:GET_USER_BY_PROJECT_ID_SAGA,idProject:arrProject[0]?.id});
+        // }
+
 
         return {
             taskName: '',
             description: '',
-            statusId: 1,
+            statusId: arrStatus[0]?.statusId,
             originalEstimate: 0,
             timeTrackingSpent:0,
             timeTrackingRemaining:0,
-            projectId:0,
-            typeId:0,
-            priorityId:0,
+            projectId:arrProject[0]?.id,
+            typeId:arrTaskType[0]?.id,
+            priorityId:arrPriority[0]?.priorityId,
             listUserAsign:[]
         }
     },
@@ -226,13 +261,25 @@ const frmCreateTask = withFormik({
 
     }),
     handleSubmit: (values, { props, setSubmitting }) => {
-        props.dispatch({type: CREATE_TASK_SAGA ,taskObject:values})
+        props.dispatch({type:CREATE_TASK_SAGA,taskObject:values})
         console.log('taskobject',values)
     },
     displayName: 'createTaskForm',
 })(FormCreateTask);
 
+// const {arrProject} = useSelector(state=>state.ProjectCyberBugsReducer);
+// const {arrTaskType} = useSelector(state=>state.TaskTypeReducer);
+// const {arrPriority} = useSelector(state => state.PriorityReducer);
+// const {userSearch} = useSelector(state => state.UserLoginCyberBugsReducer);
+// const {arrStatus} = useSelector(state => state.StatusReducer);
+const mapStateToProps = (state) => {
+    return {
+        arrProject: state.ProjectJiraReducer.arrProject,
+        arrTaskType:state.TaskTypeReducer.arrTaskType,
+        arrPriority:state.PriorityReducer.arrPriority,
+        arrStatus:state.StatusReducer.arrStatus,
+    }
+}
 
 
-
-export default connect() (frmCreateTask);
+export default connect(mapStateToProps) (frmCreateTask);

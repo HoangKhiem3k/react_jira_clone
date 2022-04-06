@@ -1,6 +1,6 @@
 import { takeLatest, call, put,delay } from 'redux-saga/effects';
 import { jiraService } from '../../services/JiraService';
-import { CREATE_PROJECT_SAGA, DELETE_PROJECT_SAGA, DISPLAY_LOADING, GET_ALL_PROJECT, GET_ALL_PROJECT_SAGA, GET_LIST_PROJECT, GET_LIST_PROJECT_SAGA, GET_PROJECT_DETAIL, HIDE_LOADING, PUT_PROJECT_DETAIL, STATUS_CODE, UPDATE_PROJECT_SAGA } from '../../util/constants/settingSystem';
+import { CREATE_PROJECT_SAGA, DELETE_PROJECT_SAGA, DISPLAY_LOADING, GET_ALL_PROJECT, GET_ALL_PROJECT_SAGA, GET_LIST_PROJECT, GET_LIST_PROJECT_SAGA, GET_PROJECT_DETAIL, GET_USER_BY_PROJECT_ID_SAGA, HIDE_LOADING, PUT_PROJECT_DETAIL, STATUS_CODE, UPDATE_PROJECT_SAGA } from '../../util/constants/settingSystem';
 import {history} from '../../util/history';
 import {notifiFunction} from '../../util/Notification/notificationJira'
 function* createProjectSaga(action) {
@@ -44,6 +44,7 @@ function *getListProjectSaga(action) {
                 type: GET_LIST_PROJECT,
                 projectList:data.content
             })
+            
         }
     }catch(err) {
         console.log(err)
@@ -188,6 +189,10 @@ function* getProjectAllSaga(action) {
         yield put({
             type: GET_ALL_PROJECT,
             arrProject:data.content
+        })
+        yield put({
+            type: GET_USER_BY_PROJECT_ID_SAGA,
+            idProject:data.content[0]?.id
         })
     
     } catch (err) {
