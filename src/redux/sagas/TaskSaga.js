@@ -1,6 +1,6 @@
 import {call, put,takeLatest} from 'redux-saga/effects'
 import { jiraService } from '../../services/JiraService';
-import { CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, GET_TASK_DETAIL, GET_TASK_DETAIL_SAGA, HIDE_LOADING, STATUS_CODE } from '../../util/constants/settingSystem';
+import { CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, GET_PROJECT_DETAIL, GET_TASK_DETAIL, GET_TASK_DETAIL_SAGA, HIDE_LOADING, STATUS_CODE, UPDATE_STATUS_TASK_SAGA } from '../../util/constants/settingSystem';
 import { notifiFunction } from '../../util/Notification/notificationJira';
 
 function* createTaskSaga (action) { 
@@ -58,4 +58,41 @@ export function* theoDoiGetTaskDetailSaga(action) {
 
     yield takeLatest(GET_TASK_DETAIL_SAGA,getTaskDetailSaga )
 
+}
+//update task 
+
+function* updateTaskStatusSaga(action) {
+
+    const { taskUpdateStatus } = action;
+    console.log(action)
+    try {
+
+        //Cập nhật api status cho task hiện tại (Task đang mở modal)
+        const {  status } = yield call(() => jiraService.updateStatusTask(taskUpdateStatus));
+
+        //Sau khi thành công gọi lại getProjectDetail saga để sắp xếp lại thông tin các task 
+        // console.log(data)
+        if (status === STATUS_CODE.SUCCESS) {
+            yield put({
+                type: GET_PROJECT_DETAIL,
+                projectId: taskUpdateStatus.projectId
+            })
+
+            yield put({
+                type: GET_TASK_DETAIL_SAGA,
+                taskId: taskUpdateStatus.taskId
+            })
+        }
+
+
+
+    } catch (err) {
+        console.log(err);
+        console.log(err.response?.data);
+
+    }
+}
+
+export function* theoDoiUpdateTaskStatusSaga() {
+    yield takeLatest(UPDATE_STATUS_TASK_SAGA, updateTaskStatusSaga)
 }

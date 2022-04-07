@@ -1,4 +1,4 @@
-import { GET_TASK_DETAIL } from "../../util/constants/settingSystem"
+import { CHANGE_TASK_MODAL, GET_TASK_DETAIL } from "../../util/constants/settingSystem"
 
 const initialState = {
     taskDetailModal:  {
@@ -47,8 +47,10 @@ export const TaskReducer = (state = initialState,action) => {
           taskDetailModal: action.taskDetailModal
         }
       }
-  
-
+      case CHANGE_TASK_MODAL:{
+        const {name,value} = action
+        return {...state, taskDetailModal: {...state.taskDetailModal, [name]: value}}
+      }
     default:
         return state
     }

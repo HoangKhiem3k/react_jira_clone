@@ -1,20 +1,73 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import HTMLReactParser from 'html-react-parser';
-import { GET_ALL_STATUS_SAGA, GET_ALL_PRIORITY_SAGA } from '../../../util/constants/settingSystem'
+import { GET_ALL_STATUS_SAGA, GET_ALL_PRIORITY_SAGA,UPDATE_STATUS_TASK_SAGA, CHANGE_TASK_MODAL, GET_ALL_TASK_TYPE_SAGA } from '../../../util/constants/settingSystem'
+import { Editor } from '@tinymce/tinymce-react';
 export default function ModalJira(props) {
     const { taskDetailModal } = useSelector(state => state.TaskReducer);
     const { arrStatus } = useSelector(state => state.StatusReducer);
     const { arrPriority } = useSelector(state => state.PriorityReducer);
+    const { arrTaskType } = useSelector(state => state.TaskTypeReducer);
+    const [visibleEditor,setVisibleEditor] = useState(false);
+    const [historyContent,setHistoryContent] = useState(taskDetailModal.description);
+    const [content,setContent] = useState(taskDetailModal.description);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch({ type: GET_ALL_STATUS_SAGA });
         dispatch({ type: GET_ALL_PRIORITY_SAGA });
+        dispatch({ type: GET_ALL_TASK_TYPE_SAGA });
     }, [])
     const renderDescription = () => {
         const jsxDescription = HTMLReactParser(taskDetailModal.description);
-        return jsxDescription;
+        return <div>
+            {visibleEditor ? <div> <Editor
+                name="description"
+                initialValue={taskDetailModal.description}
+                init={{
+                    selector: 'textarea#myTextArea',
+                    height: 500,
+                    menubar: false,
+                    plugins: [
+                        'advlist autolink lists link image charmap print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount'
+                    ],
+                    toolbar:
+                        'undo redo | formatselect | bold italic backcolor | \
+                            alignleft aligncenter alignright alignjustify | \
+                            bullist numlist outdent indent | removeformat | help'
+                }}
+                onEditorChange={(content, editor) => {
+                    setContent(content);
+                }}
+            /> 
+            
+            <button className="btn btn-primary m-2" onClick={()=>{
+                dispatch({
+                    type: CHANGE_TASK_MODAL,
+                    name:'description',
+                    value:content
+                })
+                setVisibleEditor(false);
+            }}>Save</button> 
+            <button className="btn btn-primary m-2" onClick={()=>{
+                dispatch({
+                    type: CHANGE_TASK_MODAL,
+                    name:'description',
+                    value:historyContent
+                })
+                setVisibleEditor(false)
+            }}>Close</button> 
+             </div> : <div onClick={() => {
+
+                setHistoryContent(taskDetailModal.description);
+                setVisibleEditor(!visibleEditor);
+
+            }}>{jsxDescription}</div>}
+
+
+        </div>
     }
     const renderTimeTracking = () => {
 
@@ -23,20 +76,41 @@ export default function ModalJira(props) {
         const max = Number(timeTrackingSpent) + Number(timeTrackingRemaining);
         const percent = Math.round(Number(timeTrackingSpent) / max * 100)
 
-        return <div style={{ display: 'flex' }}>
-            <i className="fa fa-clock" />
-            <div style={{ width: '100%' }}>
+        return <div>
+            <div style={{ display: 'flex' }}>
+                <i className="fa fa-clock" />
+                <div style={{ width: '100%' }}>
 
-                <div className="progress">
-                    <div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={Number(timeTrackingSpent)} aria-valuemin={Number(timeTrackingRemaining)} aria-valuemax={max} />
+                    <div className="progress">
+                        <div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={Number(timeTrackingSpent)} aria-valuemin={Number(timeTrackingRemaining)} aria-valuemax={max} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <p className="logged">{Number(timeTrackingRemaining)}h logged</p>
+                        <p className="estimate-time">{Number(timeTrackingRemaining)}h remaining</p>
+                    </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <p className="logged">{Number(timeTrackingRemaining)}h logged</p>
-                    <p className="estimate-time">{Number(timeTrackingRemaining)}h remaining</p>
+
+
+            </div>
+            <div className="row">
+
+                <div className="col-6">
+                    <input className="form-control" name="timeTrackingSpent" onChange={handleChange} />
+                </div>
+                <div className="col-6">
+                    <input className="form-control" name="timeTrackingRemaining" onChange={handleChange} />
                 </div>
             </div>
         </div>
     }
+    const handleChange = (e)=> {
+        dispatch({
+            type: CHANGE_TASK_MODAL,
+            name: e.target.name,
+            value: e.target.value
+        })
+    }
+
     return (
         <div className="modal fade" id="infoModal" tabIndex={-1} role="dialog" aria-labelledby="infoModal" aria-hidden="true">
             <div className="modal-dialog modal-info">
@@ -44,6 +118,11 @@ export default function ModalJira(props) {
                     <div className="modal-header">
                         <div className="task-title">
                             <i className="fa fa-bookmark" />
+                            <select name="typeId" value={taskDetailModal.typeId} onChange={handleChange}>
+                                {arrTaskType.map((tasktype, index) => {
+                                    return <option key={index} value={tasktype.id}>{tasktype.taskType}</option>
+                                })}
+                            </select>
                             <span>{taskDetailModal.taskName}</span>
                         </div>
                         <div style={{ display: 'flex' }} className="task-click">
@@ -116,8 +195,17 @@ export default function ModalJira(props) {
                                 <div className="col-4">
                                     <div className="status">
                                         <h6>STATUS</h6>
-                                        <select className="custom-select" value={taskDetailModal.statusId} onChange={(e) => {
-
+                                        <select name="statusId" className="custom-select" value={taskDetailModal.statusId} onChange={(e) => {
+                                            handleChange(e);
+                                            // const action = {
+                                            //     type: UPDATE_STATUS_TASK_SAGA,
+                                            //     taskUpdateStatus: {
+                                            //         taskId: taskDetailModal.taskId,
+                                            //         statusId: e.target.value,
+                                            //         projectId: taskDetailModal.projectId
+                                            //     }
+                                            // }
+                                            // dispatch(action);
                                         }}>
                                             {arrStatus.map((status, index) => {
 
@@ -165,8 +253,8 @@ export default function ModalJira(props) {
                                     </div> */}
                                     <div className="priority" style={{ marginBottom: 20 }}>
                                         <h6>PRIORITY</h6>
-                                        <select className="form-control" value={taskDetailModal.priorityTask?.priorityId} onChange={(e) => {
-
+                                        <select name="priorityId" className="form-control" value={taskDetailModal.priorityId} onChange={(e) => {
+                                            handleChange(e);
                                         }}>
                                             {arrPriority.map((item, index) => {
                                                 return <option key={index} value={item.priorityId}>{item.priority}</option>
@@ -177,7 +265,7 @@ export default function ModalJira(props) {
                                     </div>
                                     <div className="estimate">
                                         <h6>ORIGINAL ESTIMATE (HOURS)</h6>
-                                        <input type="text" className="estimate-hours" value={taskDetailModal.originalEstimate} />
+                                        <input name="originalEstimate" type="text" className="estimate-hours" value={taskDetailModal.originalEstimate} onChange={(e)=>{handleChange(e)}} />
                                     </div>
                                     <div className="time-tracking">
                                         <h6>TIME TRACKING</h6>
