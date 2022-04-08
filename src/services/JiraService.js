@@ -141,5 +141,13 @@ export const jiraService = {
             data: taskStatusUpdate,
             headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
         })
+    },
+    updateTask: (taskUpdate)=>{
+        return Axios({
+            url:`${DOMAIN_JIRA}/Project/updateTask`,
+            method:'POST',
+            data: taskUpdate,
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem(TOKEN)} 
+        })
     }
 }

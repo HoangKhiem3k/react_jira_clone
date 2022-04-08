@@ -19,9 +19,9 @@ const initialState = {
           },
           {
             "id": 41,
-            "avatar": "https://ui-avatars.com/api/?name=khải",
-            "name": "khải",
-            "alias": "khai"
+            "avatar": "https://ui-avatars.com/api/?name=khiem",
+            "name": "khiem",
+            "alias": "khiem"
           }
         ],
         "lstComment": [],

@@ -26,6 +26,8 @@ export function * rootSaga(){
         TaskSaga.theoDoiCreateTaskSaga(),
         TaskSaga.theoDoiGetTaskDetailSaga(),
         TaskSaga.theoDoiUpdateTaskStatusSaga(),
+        TaskSaga.theoDoiUdpateTask(),
+        TaskSaga.theoDoiHandleChangePostApi(),
         StatusSaga.theoDoiGetAllStatusSaga(),
     ])
 }

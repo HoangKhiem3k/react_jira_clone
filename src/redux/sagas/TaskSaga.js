@@ -1,6 +1,6 @@
-import {call, put,takeLatest} from 'redux-saga/effects'
+import {call, put,takeLatest,select} from 'redux-saga/effects'
 import { jiraService } from '../../services/JiraService';
-import { CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, GET_PROJECT_DETAIL, GET_TASK_DETAIL, GET_TASK_DETAIL_SAGA, HIDE_LOADING, STATUS_CODE, UPDATE_STATUS_TASK_SAGA } from '../../util/constants/settingSystem';
+import { CHANGE_ASSIGNESS, CHANGE_TASK_MODAL, CLOSE_DRAWER, CREATE_TASK_SAGA, DISPLAY_LOADING, GET_PROJECT_DETAIL, GET_TASK_DETAIL, GET_TASK_DETAIL_SAGA, HANDLE_CHANGE_POST_API_SAGA, HIDE_LOADING, REMOVE_USER_ASSIGN, STATUS_CODE, UPDATE_STATUS_TASK_SAGA, UPDATE_TASK_SAGA } from '../../util/constants/settingSystem';
 import { notifiFunction } from '../../util/Notification/notificationJira';
 
 function* createTaskSaga (action) { 
@@ -95,4 +95,82 @@ function* updateTaskStatusSaga(action) {
 
 export function* theoDoiUpdateTaskStatusSaga() {
     yield takeLatest(UPDATE_STATUS_TASK_SAGA, updateTaskStatusSaga)
+}
+
+
+function* updateTaskSaga(action) {
+
+
+
+}
+
+
+export function* theoDoiUdpateTask() {
+    yield takeLatest(UPDATE_TASK_SAGA, updateTaskSaga);
+}
+export function* handelChangePostApi(action) {
+    //Gọi action làm thay đổi taskDetail modal
+    switch (action.actionType) {
+        case CHANGE_TASK_MODAL: {
+            const { value, name } = action;
+
+            yield put({
+                type: CHANGE_TASK_MODAL,
+                name,
+                value
+            });
+        };break;
+        case CHANGE_ASSIGNESS: {
+            const { userSelected } = action;
+            yield put({
+                type: CHANGE_ASSIGNESS,
+                userSelected
+            })
+
+        };break;
+        case REMOVE_USER_ASSIGN: {
+            const { userId } = action;
+            yield put({
+                type: REMOVE_USER_ASSIGN,
+                userId
+            })
+        }break;
+        default:    
+    }
+
+    //Save qua api updateTaskSaga
+    //Lây dữ liệu từ state.taskDetailModal 
+    let { taskDetailModal } = yield select(state => state.TaskReducer); 
+    console.log('taskDetailModal sau khi thay đổi', taskDetailModal)
+    //Biến đổi dữ liệu state.taskDetailModal thành dữ liệu api cần
+
+    const listUserAsign = taskDetailModal.assigness?.map((user, index) => {
+        return user.id;
+    });
+
+
+    const taskUpdateApi = { ...taskDetailModal, listUserAsign }
+    try {
+        const { status } = yield call(() => jiraService.updateTask(taskUpdateApi));
+
+        if (status === STATUS_CODE.SUCCESS) {
+            yield put({
+                type: GET_PROJECT_DETAIL,
+                projectId: taskUpdateApi.projectId
+            })
+
+            yield put({
+                type: GET_TASK_DETAIL_SAGA,
+                taskId: taskUpdateApi.taskId
+            })
+        }
+    } catch(err) {
+        console.log(err.response?.data);
+        console.log(err);
+    }
+
+}
+
+export function* theoDoiHandleChangePostApi() {
+    yield takeLatest(HANDLE_CHANGE_POST_API_SAGA, handelChangePostApi);
 }

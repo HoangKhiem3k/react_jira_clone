@@ -46,16 +46,28 @@ export default function ModalJira(props) {
             />
 
                 <button className="btn btn-primary m-2" onClick={() => {
+                    // dispatch({
+                    //     type: CHANGE_TASK_MODAL,
+                    //     name: 'description',
+                    //     value: content
+                    // })
                     dispatch({
-                        type: CHANGE_TASK_MODAL,
+                        type: HANDLE_CHANGE_POST_API_SAGA,
+                        actionType: CHANGE_TASK_MODAL,
                         name: 'description',
                         value: content
                     })
                     setVisibleEditor(false);
                 }}>Save</button>
                 <button className="btn btn-primary m-2" onClick={() => {
+                    // dispatch({
+                    //     type: CHANGE_TASK_MODAL,
+                    //     name: 'description',
+                    //     value: historyContent
+                    // })
                     dispatch({
-                        type: CHANGE_TASK_MODAL,
+                        type: HANDLE_CHANGE_POST_API_SAGA,
+                        actionType: CHANGE_TASK_MODAL,
                         name: 'description',
                         value: historyContent
                     })
@@ -106,11 +118,18 @@ export default function ModalJira(props) {
         </div>
     }
     const handleChange = (e) => {
+
         dispatch({
-            type: CHANGE_TASK_MODAL,
+            type: HANDLE_CHANGE_POST_API_SAGA,
+            actionType: CHANGE_TASK_MODAL,
             name: e.target.name,
             value: e.target.value
         })
+        // dispatch({
+        //     type: CHANGE_TASK_MODAL,
+        //     name: e.target.name,
+        //     value: e.target.value
+        // })
     }
 
     return (
@@ -233,9 +252,14 @@ export default function ModalJira(props) {
                                                                 {user.name}
                                                                 <i className="fa fa-times" style={{ marginLeft: 5,cursor:'pointer' }}  onClick={() => {
                                                                     dispatch({
-                                                                        type:REMOVE_USER_ASSIGN,
-                                                                        userId:user.id
+                                                                        type: HANDLE_CHANGE_POST_API_SAGA,
+                                                                        actionType: REMOVE_USER_ASSIGN,
+                                                                        userId:user.id,
                                                                     })
+                                                                    // dispatch({
+                                                                    //     type:REMOVE_USER_ASSIGN,
+                                                                    //     userId:user.id
+                                                                    // })
                                                                 }}  />
                                                             </p>
                                                         </div>
@@ -268,9 +292,14 @@ export default function ModalJira(props) {
                                                         userSelected = { ...userSelected, id: userSelected.userId };
                                                         //dispatchReducer
                                                         dispatch({
-                                                            type: CHANGE_ASSIGNESS,
+                                                            type: HANDLE_CHANGE_POST_API_SAGA,
+                                                            actionType: CHANGE_ASSIGNESS,
                                                             userSelected
                                                         })
+                                                        // dispatch({
+                                                        //     type: CHANGE_ASSIGNESS,
+                                                        //     userSelected
+                                                        // })
                                                     }}>
                                                     
                                                     
