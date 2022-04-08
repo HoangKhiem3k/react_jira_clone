@@ -1,4 +1,4 @@
-import { CHANGE_TASK_MODAL, GET_TASK_DETAIL } from "../../util/constants/settingSystem"
+import { CHANGE_ASSIGNESS, CHANGE_TASK_MODAL, GET_TASK_DETAIL, REMOVE_USER_ASSIGN } from "../../util/constants/settingSystem"
 
 const initialState = {
     taskDetailModal:  {
@@ -50,6 +50,14 @@ export const TaskReducer = (state = initialState,action) => {
       case CHANGE_TASK_MODAL:{
         const {name,value} = action
         return {...state, taskDetailModal: {...state.taskDetailModal, [name]: value}}
+      }
+      case CHANGE_ASSIGNESS:{
+        state.taskDetailModal.assigness = [...state.taskDetailModal.assigness, action.userSelected]
+        return {...state}
+      }
+      case REMOVE_USER_ASSIGN:{
+        state.taskDetailModal.assigness = [...state.taskDetailModal.assigness.filter(user => user.id !== action.userId)]
+        return {...state}
       }
     default:
         return state
