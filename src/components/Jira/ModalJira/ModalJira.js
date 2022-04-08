@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import HTMLReactParser from 'html-react-parser';
-import { GET_ALL_STATUS_SAGA, GET_ALL_PRIORITY_SAGA, UPDATE_STATUS_TASK_SAGA, CHANGE_TASK_MODAL, GET_ALL_TASK_TYPE_SAGA, REMOVE_USER_ASSIGN, HANDLE_CHANGE_POST_API_SAGA, CHANGE_ASSIGNESS } from '../../../util/constants/settingSystem'
+import { GET_ALL_STATUS_SAGA, GET_ALL_PRIORITY_SAGA, CHANGE_TASK_MODAL, GET_ALL_TASK_TYPE_SAGA, REMOVE_USER_ASSIGN, HANDLE_CHANGE_POST_API_SAGA, CHANGE_ASSIGNESS } from '../../../util/constants/settingSystem'
 import { Editor } from '@tinymce/tinymce-react';
 import { Select } from 'antd';
 export default function ModalJira(props) {
@@ -241,8 +241,8 @@ export default function ModalJira(props) {
                                         <div className="row">
                                             {
                                                 taskDetailModal.assigness.map((user, index) => {
-                                                    return <div className="col-6  mt-2 mb-2">
-                                                        <div key={index} style={{ display: 'flex' }} className="item">
+                                                    return <div key={index}className="col-6  mt-2 mb-2">
+                                                        <div style={{ display: 'flex' }} className="item">
 
 
                                                             <div className="avatar">
